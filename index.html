@@ -4,21 +4,27 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Pandabox HQ — Hardware Usage Dashboard</title>
-<style>*{margin:0;padding:0;box-sizing:border-box}body{background:#0c0a09}#root{min-height:100vh;display:none}#loading{color:#a8a29e;font-family:monospace;display:flex;align-items:center;justify-content:center;height:100vh;font-size:14px}#error{color:#ef4444;font-family:monospace;padding:40px;white-space:pre-wrap}
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0c0a09}
+#root{min-height:100vh;display:none}
+#loading{color:#a8a29e;font-family:monospace;display:flex;align-items:center;justify-content:center;height:100vh;font-size:14px}
+#error{color:#ef4444;font-family:monospace;padding:40px;white-space:pre-wrap}
 #auth-gate{display:flex;align-items:center;justify-content:center;height:100vh;background:#0c0a09;font-family:'Segoe UI',system-ui,sans-serif}
-#auth-box{background:linear-gradient(135deg,#1c1917,#292524);border:1px solid #44403c;border-radius:16px;padding:40px 44px;width:420px;text-align:center}
+#auth-box{background:#1c1917;border:1px solid #44403c;border-radius:16px;padding:40px 44px;width:420px;text-align:center}
 #auth-box h1{color:#fafaf9;font-size:22px;font-weight:800;margin-bottom:4px}
 #auth-box h1 span{color:#f97316}
 #auth-box p{color:#78716c;font-size:12px;font-family:monospace;margin-bottom:28px}
-#auth-box input{width:100%;padding:14px 18px;border-radius:10px;border:1px solid #44403c;background:#0c0a09;color:#fafaf9;font-size:15px;font-family:monospace;outline:none}
-#auth-box input:focus{border-color:#78716c}
-#pw-wrap{position:relative;margin-bottom:16px}
-#pw-wrap input{padding-right:42px}
-#pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;width:18px;height:18px;display:flex;align-items:center;justify-content:center;opacity:0.35}
-#pw-toggle svg{width:15px;height:15px;stroke:#a8a29e;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-#pw-toggle:hover{opacity:0.7}
-#auth-box button{width:100%;padding:12px;border:none;border-radius:10px;background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Segoe UI',system-ui,sans-serif}
-#auth-box button:hover{opacity:0.9}
+#input-row{display:flex;align-items:center;background:#0c0a09;border:1px solid #44403c;border-radius:10px;margin-bottom:16px;overflow:hidden}
+#input-row:focus-within{border-color:#78716c}
+#auth-input{flex:1;padding:14px 0 14px 18px;border:none;background:transparent;color:#fafaf9;font-size:15px;font-family:monospace;outline:none}
+#auth-input::placeholder{color:#78716c}
+#auth-input:-webkit-autofill{-webkit-box-shadow:0 0 0 1000px #0c0a09 inset !important;-webkit-text-fill-color:#fafaf9 !important;transition:background-color 9999s ease-in-out 0s}
+#eye-btn{background:none;border:none;cursor:pointer;padding:0 14px 0 8px;display:flex;align-items:center;flex-shrink:0}
+#eye-btn svg{width:16px;height:16px;stroke:#78716c;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#eye-btn:hover svg{stroke:#a8a29e}
+#sign-btn{width:100%;padding:12px;border:none;border-radius:10px;background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Segoe UI',system-ui,sans-serif}
+#sign-btn:hover{opacity:0.9}
 #auth-error{color:#ef4444;font-size:12px;font-family:monospace;margin-top:12px;display:none}
 #auth-logo{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#f97316,#ea580c);display:inline-flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#fff;margin-bottom:16px}
 </style>
@@ -30,14 +36,14 @@
     <div id="auth-logo">P</div>
     <h1>Pandabox <span>HQ</span></h1>
     <p>Enter password to access the dashboard</p>
-    <div id="pw-wrap">
-      <input type="password" id="auth-input" placeholder="Password" autofocus onkeydown="if(event.key==='Enter')doLogin()"/>
-      <button type="button" id="pw-toggle" onclick="togglePw()" title="Show password">
-        <svg id="eye-open" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-        <svg id="eye-closed" viewBox="0 0 24 24" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+    <div id="input-row">
+      <input type="password" id="auth-input" placeholder="Password" autocomplete="off" autofocus onkeydown="if(event.key==='Enter')doLogin()"/>
+      <button type="button" id="eye-btn" onclick="togglePw()">
+        <svg id="ico-hide" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <svg id="ico-show" viewBox="0 0 24 24" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
       </button>
     </div>
-    <button onclick="doLogin()">Sign In</button>
+    <button id="sign-btn" onclick="doLogin()">Sign In</button>
     <div id="auth-error">Incorrect password. Try again.</div>
   </div>
 </div>
@@ -57,7 +63,7 @@ async function doLogin(){
   const pw=document.getElementById('auth-input').value;
   const hash=await sha256(pw);
   if(hash===HASH){
-    sessionStorage.setItem('pb_auth','1');
+    sessionStorage.setItem('pb_auth',Date.now().toString());
     showDashboard();
   } else {
     document.getElementById('auth-error').style.display='block';
@@ -69,25 +75,45 @@ async function doLogin(){
 function showDashboard(){
   document.getElementById('auth-gate').style.display='none';
   document.getElementById('root').style.display='block';
+  startSessionTimer();
+}
+
+function lockDashboard(){
+  sessionStorage.removeItem('pb_auth');
+  document.getElementById('root').style.display='none';
+  document.getElementById('auth-gate').style.display='flex';
+  document.getElementById('auth-input').value='';
+  document.getElementById('auth-error').style.display='none';
+  document.getElementById('auth-input').focus();
 }
 
 function togglePw(){
-  const inp=document.getElementById('auth-input');
-  const open=document.getElementById('eye-open');
-  const closed=document.getElementById('eye-closed');
+  var inp=document.getElementById('auth-input');
   if(inp.type==='password'){
     inp.type='text';
-    open.style.display='none';
-    closed.style.display='block';
-  } else {
+    document.getElementById('ico-hide').style.display='none';
+    document.getElementById('ico-show').style.display='block';
+  }else{
     inp.type='password';
-    open.style.display='block';
-    closed.style.display='none';
+    document.getElementById('ico-hide').style.display='block';
+    document.getElementById('ico-show').style.display='none';
   }
   inp.focus();
 }
 
-if(sessionStorage.getItem('pb_auth')==='1') showDashboard();
+function startSessionTimer(){
+  setInterval(function(){
+    const loginTime=parseInt(sessionStorage.getItem('pb_auth')||'0');
+    if(Date.now()-loginTime > 180000){
+      lockDashboard();
+    }
+  },5000);
+}
+
+const saved=parseInt(sessionStorage.getItem('pb_auth')||'0');
+if(saved && (Date.now()-saved < 180000)){
+  showDashboard();
+}
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>

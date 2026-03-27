@@ -79,7 +79,10 @@ function showDashboard(){
   startSessionTimer();
 }
 
+var sessionTimerId=null;
+
 function lockDashboard(){
+  if(sessionTimerId){clearInterval(sessionTimerId);sessionTimerId=null;}
   sessionStorage.removeItem('pb_auth');
   document.getElementById('root').style.display='none';
   document.getElementById('auth-gate').style.display='flex';
@@ -103,9 +106,10 @@ function togglePw(){
 }
 
 function startSessionTimer(){
-  setInterval(function(){
+  if(sessionTimerId) clearInterval(sessionTimerId);
+  sessionTimerId=setInterval(function(){
     const loginTime=parseInt(sessionStorage.getItem('pb_auth')||'0');
-    if(Date.now()-loginTime > 180000){
+    if(!loginTime || Date.now()-loginTime > 180000){
       lockDashboard();
     }
   },5000);

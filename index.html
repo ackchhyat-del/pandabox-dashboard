@@ -75,6 +75,7 @@ async function doLogin(){
 function showDashboard(){
   document.getElementById('auth-gate').style.display='none';
   document.getElementById('root').style.display='block';
+  if(window.resetCountdown) window.resetCountdown();
   startSessionTimer();
 }
 
@@ -240,7 +241,13 @@ function App(){
   const [sd,setSd]=useState("asc");
   const [tr,setTr]=useState("3m");
   const [now,setNow]=useState(new Date());
-  useEffect(()=>{const t=setInterval(()=>setNow(new Date()),1000);return()=>clearInterval(t);},[]);
+  const [countdown,setCountdown]=useState(180);
+  useEffect(()=>{window.resetCountdown=()=>setCountdown(180);const t=setInterval(()=>{setNow(new Date());setCountdown(prev=>{if(prev<=1){if(typeof lockDashboard==='function')lockDashboard();return 0;}return prev-1;});},1000);return()=>clearInterval(t);},[]);
+
+  const mins=Math.floor(countdown/60);
+  const secs=countdown%60;
+  const timerStr=mins+":"+(secs<10?"0":"")+secs;
+  const timerColor=countdown<=30?"#ef4444":countdown<=60?"#eab308":"#a8a29e";
 
   const fil=useMemo(()=>{if(!q)return TENANTS;const ql=q.toLowerCase();return TENANTS.filter(t=>t.name.toLowerCase().includes(ql)||t.tid.toLowerCase().includes(ql));},[q]);
   const srt=useMemo(()=>[...fil].sort((a,b)=>{const av=a[sc],bv=b[sc];return typeof av==="number"?(sd==="asc"?av-bv:bv-av):(sd==="asc"?String(av).localeCompare(String(bv)):String(bv).localeCompare(String(av)))}),[fil,sc,sd]);
@@ -263,9 +270,15 @@ function App(){
         <div style={{width:36,height:36,borderRadius:10,background:"linear-gradient(135deg,#f97316,#ea580c)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,fontWeight:800,color:"#fff"}}>P</div>
         <div><h1 style={{margin:0,fontSize:18,fontWeight:800,letterSpacing:-.5}}>Pandabox <span style={{color:"#f97316"}}>HQ</span></h1><p style={{margin:0,fontSize:10,color:"#78716c",fontFamily:"monospace"}}>Hardware Usage Dashboard</p></div>
       </div>
-      <div style={{display:"flex",alignItems:"center",gap:6}}>
-        <div style={{width:7,height:7,borderRadius:"50%",background:"#22c55e"}}/>
-        <span style={{fontSize:10,color:"#a8a29e",fontFamily:"monospace"}}>Last sync: {now.toLocaleString("en-US",{month:"short",day:"numeric",year:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:true})}</span>
+      <div style={{display:"flex",alignItems:"center",gap:14}}>
+        <div style={{display:"flex",alignItems:"center",gap:6}}>
+          <div style={{width:7,height:7,borderRadius:"50%",background:"#22c55e"}}/>
+          <span style={{fontSize:10,color:"#a8a29e",fontFamily:"monospace"}}>Last sync: {now.toLocaleString("en-US",{month:"short",day:"numeric",year:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:true})}</span>
+        </div>
+        <div style={{width:1,height:16,background:"#44403c"}}/>
+        <div style={{display:"flex",alignItems:"center",gap:5}}>
+          <span style={{fontSize:10,color:timerColor,fontFamily:"monospace",fontWeight:countdown<=60?700:400}}>Auto-logout: {timerStr}</span>
+        </div>
       </div>
     </header>
 
